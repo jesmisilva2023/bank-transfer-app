@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank Transfer System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #0056b3; }
+        .alert-success { background: #d4edda; color: #155724; padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .alert-danger { background: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #0056b3; color: white; }
+        form { margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 5px; }
+        input, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background-color: #0056b3; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:hover { background-color: #004085; }
+        .row { display: flex; gap: 20px; }
+        .col { flex: 1; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Bank Transfer System Dashboard</h1>
+
+    <div th:if="${message}" class="alert-success" th:text="${message}"></div>
+    <div th:if="${error}" class="alert-danger" th:text="${error}"></div>
+
+    <div class="row">
+    
+        <div class="col">
+            <h2>Transfer Money</h2>
+            <form action="#" th:action="@{/transfer}" method="post">
+                <label>From Account Number:</label>
+                <input type="text" name="fromAccount" required />
+
+                <label>To Account Number:</label>
+                <input type="text" name="toAccount" required />
+
+                <label>Amount (LKR):</label>
+                <input type="number" step="0.01" name="amount" required />
+
+                <label>
+                    <input type="checkbox" name="simulateFailure" style="width: auto;" /> Simulate System Failure (Rollback Test)
+                </label>
+
+                <button type="submit">Transfer</button>
+            </form>
+        </div>
+
+        <!-- Add Customer Form -->
+        <div class="col">
+            <h2>Add Customer</h2>
+            <form action="#" th:action="@{/customers}" method="post">
+                <label>Account Number:</label>
+                <input type="text" name="accountNumber" required />
+
+                <label>Full Name:</label>
+                <input type="text" name="fullName" required />
+
+                <label>Initial Balance (LKR):</label>
+                <input type="number" step="0.01" name="balance" required />
+
+                <label>Email:</label>
+                <input type="email" name="email" required />
+
+                <button type="submit">Add Customer</button>
+            </form>
+        </div>
+    </div>
+
+    <h2>Customers & Balances (Total: <span th:text="${totalBalance}">0.00</span> LKR)</h2>
+    
+
+    <form action="#" th:action="@{/}" method="get" style="background: none; padding: 0;">
+        <input type="text" name="keyword" placeholder="Search customer by name..." style="width: 70%; display: inline-block;" />
+        <button type="submit" style="width: 28%; display: inline-block;">Search</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Account Number</th>
+                <th>Name</th>
+                <th>Balance (LKR)</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="customer : ${customers}">
+                <td th:text="${customer.accountNumber}">100001</td>
+                <td th:text="${customer.fullName}">Kamal</td>
+                <td th:text="${customer.balance}">50000.00</td>
+                <td th:text="${customer.email}">kamal@example.com</td>
+                <td>
+                    <a th:href="@{/accounts/{acc}/history(acc=${customer.accountNumber})}">History</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <h2>Latest Transactions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Description</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="tx : ${transactions}">
+                <td th:text="${tx.id}">1</td>
+                <td th:text="${tx.fromAccount}">100001</td>
+                <td th:text="${tx.toAccount}">100002</td>
+                <td th:text="${tx.amount}">5000.00</td>
+                <td th:text="${tx.status}" th:style="${tx.status.name() == 'SUCCESS'} ? 'color: green;' : 'color: red;'">SUCCESS</td>
+                <td th:text="${tx.description}">Transfer completed</td>
+                <td th:text="${tx.createdAt}">2026-03-30</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>
